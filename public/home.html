@@ -1,0 +1,473 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>order by us</title>
+    <link rel="stylesheet" href="./home2.css" />
+    <script src="./home2.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            // document.getElementById("navbar").style.display = "none";
+            document.getElementById("navbar").style.cssText =
+                "position:absolute;background-color:black;width:100%;display:none;";
+            function myFunction(x) {
+                if (x.matches) {
+                    document.getElementById("navbar").style.cssText =
+                        "display:none;position:absolute;background-color:black;width:100%;display:none;";
+                } else {
+                    $(window).scroll(function () {
+                        if ($(this).scrollTop() > 170) {
+                            document.getElementById("navbar").style.cssText =
+                                "position:fixed;background-color:black;top:0;width:100%;box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px;";
+
+                            $(".navbar").fadeIn();
+                        } else {
+                            document.getElementById("navbar").style.cssText =
+                                "display:none;position:absolute;background-color:black;width:100%;display:none;";
+                        }
+                    });
+                }
+            }
+
+            var x = window.matchMedia("(max-width: 500px)");
+            myFunction(x); // Call listener function at run time
+            x.addListener(myFunction);
+            const accessToken =
+                localStorage.getItem("accessToken") !== "undefined"
+                    ? JSON.parse(localStorage.getItem("accessToken"))
+                    : localStorage.clear();
+            if (accessToken) {
+                document.getElementById("nouser").style.display = "none";
+                document.getElementById("user").style.display = "true";
+                document.getElementById("nouser1").style.display = "none";
+                document.getElementById("user1").style.display = "true";
+            } else {
+                // alert("nouser");
+                document.getElementById("nouser").style.display = "true";
+                document.getElementById("user").style.display = "none";
+                document.getElementById("nouser1").style.display = "true";
+                document.getElementById("user1").style.display = "none";
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1200,
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <div class="whole">
+        <div>
+            <div class="row header-top">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 title-gif-div">
+                    <img src="./mp4/title.gif" class="title-gif" style="width: 750px" />
+                </div>
+
+                <div class="row registration col-lg-3 col-md-3 col-sm-3 col-xs-12" id="nouser">
+                    <a class="login col-lg-12 col-md-12 col-sm-6 col-xs-6" href="/login?q=signin"
+                        style="text-decoration: none; color: black">
+                        Login
+                        <i class="fa fa-sign-in" style="font-size: 18px; padding-left: 3px"></i>
+                    </a>
+                    <a class="signup col-lg-12 col-md-12 col-sm-6 col-xs-6" href="/login?q=register"
+                        style="text-decoration: none; color: black">
+                        SignUp
+                    </a>
+                </div>
+                <div class="row registration col-lg-3 col-md-3 col-sm-3 col-xs-12" id="user">
+                    <a class="signup col-lg-12 col-md-12 col-sm-6 col-xs-6" href="/" onclick="signout()"
+                        style="text-decoration: none; color: black">
+                        SignOut
+                    </a>
+                </div>
+            </div>
+            <br /><br />
+
+            <nav class="navbar-style navbar navbar-expand-sm bg-light sticky-top" id="navbar">
+                <div class="container-fluid header1" id="header1">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <!-- <a class="nav-link active nav-logo " href="#">OBU</a> -->
+                            <img src="./mp4/title.gif" class="logo-obu-gif" alt="" />
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pp" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pp" href="#aboutid">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pp" href="#teamid">Team</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pp" href="#contactid">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="login-signup" id="nouser1">
+                    <ul class="navbar-nav header2">
+                        <li class="nav-item">
+                            <a class="nav-link loginn" href="/login?q=signin">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link signupp" href="/login?q=register">SignUp</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="login-signup" id="user1">
+                    <ul class="navbar-nav header2">
+                        <li class="nav-item">
+                            <a class="nav-link signupp" href="/" onclick="signout()">Signout</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="ordernow"  onclick="active()">
+                <a class="order" style="text-decoration: none !important; color: black">
+                    Go to Orders Page<i class='fas fa-shopping-cart' style="padding-left: 10px;"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- carasol -->
+
+        <div class="row tile" >
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 carasoll" loading="eager|lazy">
+                <div id="demo" class="carousel slide carasoll_inside" data-bs-ride="carousel">
+                    <!-- Indicators/dots -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                    </div>
+
+                    <!-- The slideshow/carousel -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="./images/1.jpg" alt="Los Angeles" class="d-block" style="width: 100%" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/2.jpg" alt="Chicago" class="d-block" style="width: 100%" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="./images/4.jpg" alt="New York" class="d-block" style="width: 100%" />
+                        </div>
+                    </div>
+
+                    <!-- Left and right controls/icons -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="information col-lg-5 col-md-5 col-sm-5 col-xs-12" style="font-size: 20px;padding:0px 30px 0px 30px;color: gray;">
+                As we know necessity is the mother of invention . Student like us who
+                study in rural area universities dont have online food odering facility.
+                Inorder to help those students we are developing this website.Now-a-days
+                for students in universities like RGUKT , it become hectic task to get
+                the food from campus food courts.As the food courts are usually far from
+                the hostels , most of the people are not willing to walk up to the food
+                courts and get their food.So we are developing a web page which help
+                people in delivering their food at their door step by the students
+                itself , who ever deliver the food get paid by the client.
+            </div>
+        </div>
+        <!-- ABOUT-->
+        <div class="row tile" id="aboutid" >
+            <div class="col-12 about">ABOUT</div>
+            <div>
+                <p class="container-fluid about_description" style="font-size: 20px;padding:0px 30px 0px 15px;color: gray;">
+                    We the studets of Computer Science Engeneering RGUKT basar are developing a website named OrderByUs.
+Students in universities similar RGUKT, who has no accessability of online food ordering facility, OrderByUs a platform for those students. Where they 
+can order food besides deliver food by means of they can get benefits.So this is like a platform to facilitate students saving there time and get their
+food at their door step furthermore make students financially indipendent in college.Our task is to join the users who want food plus who want money.
+Whoever want food they can place order in our website, agents who are willing to deliver can takeup the order and deliver to the user receiving resonable
+delivery charges.
+We finally come by want we expected ,now we are ready with our website to help student  who are not having online food ordering facility. 
+This website will help many students who are studying in rural area colleges / universities. We are providing a platform to students without expecting any 
+benifits, OrderByUs is completely free platform , any one can access it ,not only in colleges we can implement this anywhere. All this site need is a user
+who want things delivered at their door step and a delivery agent who is ready to deliver the things specified by user.
+
+                </p>
+            </div>
+        </div>
+
+        <!---TEAM-->
+        <div class="team tile" id="teamid" >TEAM</div>
+        <div class="team-cards" >
+            <div class="flip-card card" data-aos="fade-right">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="card-img-top card-image" style="height: 400px; object-fit: cover"
+                            src="./images/user.png" alt="Card image" />
+                    </div>
+                    <div class="flip-card-back">
+                        <h2 class="name">Santhosh Kumar</h2>
+                        <!-- <p class="position">Architect & Engineer</p> -->
+                        <div class="details">
+                            
+
+                            <!-- Twitter -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: #1da1f2;
+                  border: 2px solid #1da1f2;
+                  width: 30px !important;
+                " href="https://twitter.com/santhosh143rgj" target="_blank" role="button"><i class="fa fa-twitter" style="color: white"></i></a>
+
+                            <!-- Google -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: white;
+                  border: 2px solid white;
+                  width: 30px !important;
+                " href="mailto:santhosh143rgj@gmail.com" target="_blank" role="button"><i class="fa fa-envelope" style="color: black"></i></a>
+
+                            <!-- Instagram -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: white;
+                  border: 2px solid white;
+                  width: 30px !important;
+                " href="https://instagram.com/hsohtnas_ss" target="_blank" role="button"><i class="fa fa-instagram" style="color: black"></i></a>
+
+                            <!-- Linkedin -->
+                            <a class="btn btn-primary btn-floating m-1"
+                                style="background-color: #0077b5; width: 30px !important" href="https://www.linkedin.com/in/santhosh-kumar-padidala" target="_blank" role="button"><i
+                                    class="fa fa-linkedin-in" style="color: white"></i></a>
+                            <!-- Github -->
+                            <a class="btn btn-primary btn-floating m-1"
+                                style="background-color: #171515; width: 30px !important" href="https://github.com/Hsohtnas143" target="_blank" role="button"><i
+                                    class="fa fa-github" style="color: white"></i></a>
+                        </div>
+                        <p class="comments" style="padding: 20px">
+                            He's awesome.
+                            
+                        </p>
+                        <p class="comments">Try Connecting with him ❤️</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card card" data-aos="fade-left">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="card-img-top card-image" style="height: 400px; object-fit: cover"
+                            src="./images/user.png" alt="Card image" />
+                    </div>
+                    <div class="flip-card-back">
+                        <h2 class="name">Vijayasimha Reddy</h2>
+                        <p class="position">Web Developer</p>
+                        <div class="details">
+                           
+
+                            <!-- Twitter -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: #1da1f2;
+                  border: 2px solid #1da1f2;
+                  width: 30px !important;
+                " href="https://twitter.com/Vijaysimha1414" target="_blank" role="button"><i class="fa fa-twitter" style="color: white"></i></a>
+
+                            <!-- Google -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: white;
+                  border: 2px solid white;
+                  width: 30px !important;
+                " href="emailto:kamidivijayasimhareddy@gmail.com" target="_blank" role="button"><i class="fa fa-envelope" style="color: black"></i></a>
+
+                            <!-- Instagram -->
+                            <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: white;
+                  border: 2px solid white;
+                  width: 30px !important;
+                " href="https://www.instagram.com/vijaysimha_kingsman/" target="_blank" role="button"><i class="fa fa-instagram" style="color: black"></i></a>
+
+                            <!-- Linkedin -->
+                            <a class="btn btn-primary btn-floating m-1"
+                                style="background-color: #0077b5; width: 30px !important" href="https://www.linkedin.com/in/vijayasimhareddy1414/" target="_blank" role="button"><i
+                                    class="fa fa-linkedin-in" style="color: white"></i></a>
+                            <!-- Github -->
+                            <a class="btn btn-primary btn-floating m-1"
+                                style="background-color: #171515; width: 30px !important" href="https://github.com/vijaysimhar-kingsman" target="_blank" role="button"><i
+                                    class="fa fa-github" style="color: white"></i></a>
+                        </div>
+                        <p class="comments" style="padding: 20px">
+                            He's awesome.
+                            
+                        </p>
+                        <p class="comments">Try Connecting with him ❤️</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!---TEAM-->
+        <div class="line"></div>
+        <div class="popular-food-ites tile" >
+            POPULAR FOOD ITEMS
+        </div>
+        <div class="food-pic tile" >
+            <div>
+                <img src="./images/del5.png" onmouseover="returnImage('del5.png')" class="food-image" id="food-image"
+                    style="width: 500px; height: 400px" alt="food item name" />
+            </div>
+            <div class="food-items" id="image_change">
+                <div class="item" onmouseover="imagee(`Manchuria`)">
+                    <div class="item-name" value="Manchuria" id="idd">Manchuria</div>
+                    <br /><br />
+                    <div class="item-price">Rs.70</div>
+                </div>
+                <div class="item" onmouseover="imagee(`Biryani`)">
+                    <div class="item-name">Biryani</div>
+                    <br /><br />
+                    <div class="item-price">Rs.150</div>
+                </div>
+                <div class="item" onmouseover="imagee(`Noodles`)">
+                    <div class="item-name">Noodles</div>
+                    <br /><br />
+                    <div class="item-price">Rs.60</div>
+                </div>
+                <div class="item" onmouseover="imagee(`Egg Rice`)">
+                    <div class="item-name">Egg Rice</div>
+                    <br /><br />
+                    <div class="item-price">Rs.60</div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+
+        <div>
+            <!-- Remove the container if you want to extend the Footer to full width. -->
+            <div class="container my-5" >
+                <!-- Footer -->
+                <footer class="text-center text-lg-start text-white" style="
+            border: 0.001px solid gray;
+            background-color: white;
+            color: black !important;
+          ">
+                    <!-- Grid container -->
+                    <div class="container p-4 pb-0">
+                        <!-- Section: Links -->
+                        <section class="">
+                            <!--Grid row-->
+                            <div class="row">
+                                <!-- Grid column -->
+                                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold">
+                                        ORDER BY US
+                                    </h6>
+                                    <p>
+                                        Food delivering website
+                                    </p>
+                                </div>
+                                <!-- Grid column -->
+
+                                <hr class="w-100 clearfix d-md-none" />
+
+                                <!-- Grid column -->
+                                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold">Products</h6>
+                                    <p>
+                                        <a class="text-black" href="#" >Home</a>
+                                    </p>
+                                    <p>
+                                        <a class="text-black" href="document.html" target="_blank">Documentation</a>
+                                    </p>
+                                   
+                                    <p>
+                                        <a class="text-black" id="contactid">Help</a>
+                                    </p>
+                                </div>
+                                <!-- Grid column -->
+
+                                <hr class="w-100 clearfix d-md-none" />
+
+                                <!-- Grid column -->
+                                <hr class="w-100 clearfix d-md-none" />
+
+                                <!-- Grid column -->
+                                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold">Contact</h6>
+
+                                    <p><i class="fas fa-location-arrow"></i> Basar, Telangana</p>
+                                    <p>
+                                        <i class="fas fa-envelope mr-3"></i>
+                                        <a href="/report">orderbyus17@gmail.com</a>
+                                    </p>
+                                    <p><i class="fas fa-phone mr-3"></i> + 91 6300248484</p>
+                                    <!-- <p><i class="fas fa-print mr-3"></i> + 01 XXXXXXXXXX</p> -->
+                                </div>
+                                <!-- Grid column -->
+
+                                <!-- Grid column -->
+                                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
+                                    <h6 class="text-uppercase mb-4 font-weight-bold">
+                                        Follow us
+                                    </h6>
+
+                                    <!-- Facebook -->
+
+                                    <!-- Twitter -->
+                                    <a class="btn btn-primary btn-floating m-1"
+                                        style="background-color: #1da1f2; border: 2px solid #1da1f2" href="https://twitter.com/Vijaysimha1414" target="_blank"
+                                        role="button"><i class="fa fa-twitter" style="color: white"></i></a>
+
+                                    <!-- Google -->
+
+                                    <!-- Instagram -->
+                                    <a class="btn btn-primary btn-floating m-1"
+                                        style="background-color: white; border: 2px solid white" href="https://instagram.com/hsohtnas_ss" target="_blank"
+                                        role="button"><i class="fa fa-instagram" style="color: black"></i></a>
+
+                                    <!-- Linkedin -->
+                                    <a class="btn btn-primary btn-floating m-1" style="background-color: #0077b5"
+                                        href="https://www.linkedin.com/in/santhosh-kumar-padidala" target="_blank" role="button"><i class="fa fa-linkedin-in"
+                                            style="color: white"></i></a>
+                                             <a class="btn btn-primary btn-floating m-1" style="
+                  background-color: white;
+                  border: 2px solid white;
+                  width: 30px !important;
+                " href="emailto:orderbyus17@gmail.com" target="_blank" role="button"><i class="fa fa-envelope" style="color: black"></i></a>
+                                    <!-- Github -->
+                                    
+                                </div>
+                            </div>
+                            <!--Grid row-->
+                        </section>
+                        <!-- Section: Links -->
+                    </div>
+                    <!-- Grid container -->
+                    <br />
+                    <!-- Copyright -->
+                    <div class="text-center p-3" style="background-color: rgba(232, 156, 7, 0.8)">
+                        © 2022 Copyright:
+                        <a class="text-white" href="https://orderbyus.herokuapp.com/" target="_blank">ORDERBYUS.com</a>
+                    </div>
+                    <!-- Copyright -->
+                </footer>
+                <!-- Footer -->
+            </div>
+            <!-- End of .container -->
+        </div>
+    </div>
+</body>
+
+</html>

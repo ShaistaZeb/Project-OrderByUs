@@ -1,0 +1,220 @@
+.body{
+  /* background-color:forestgreen; */
+    /* background-color:rgb(255,81,67); */
+    height: 100vh;
+    /* width: 100vh; */
+    /* background-image: url("https://www.xmple.com/wallpaper/white-gradient-blue-linear-2560x1440-c2-87cefa-ffffff-a-90-f-14.svg"); */
+}
+
+.title{
+    /* padding: 20px; */
+    color: white;
+    font-weight: 400;
+    font-size: 30px;
+    font-family: AeonikWeb,serif;
+    font-style:normal;
+    margin-right: 20px;
+    -webkit-text-stroke: 0.5px rgb(30, 30, 29);
+   color: black;
+   /* text-shadow:
+       2px 2px 0 white,
+     -1px -1px 0 white,  
+      1px -1px 0 white,
+      -1px 1px 0 white,
+       1px 1px 0 white; */
+}
+
+.about,.team{
+  font-weight:lighter;
+  margin-left: 20px;
+  font-family: sans-serif;
+  font-size:medium;
+}
+
+
+.about,.team {
+  display: inline-block;
+  position: relative;
+}
+
+.about:after,.team:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: rgb(30, 30, 29);
+  /* background-color: #0087ca; */
+  transform-origin: bottom right;
+  transition: transform 0.5s ease-out;
+}
+
+.about:hover:after , .team:hover:after{
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.navbar{
+  display: flex;
+  flex-direction: row;
+  /* width: 40vh; */
+  color: rgb(30, 30, 29);
+  padding: 10px;
+  align-items: baseline;
+  /* background-image: url("https://www.xmple.com/wallpaper/white-gradient-blue-linear-2560x1440-c2-87cefa-ffffff-a-90-f-14.svg"); */
+  /* background-color: rgb(255,81,67); */
+}
+.signIn{
+    position: absolute;
+    right:20px;
+    top: 20px;
+    font-weight: lighter;
+    
+    display: flex;
+    flex-direction: row;
+    color: white;
+    background-color: rgb(30, 30, 29);
+    
+    border-radius: 20px;
+    padding-left: 30px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    
+
+
+}
+
+.p:hover {
+  animation: fadeIn 2s;
+}
+@keyframes fadeIn {
+  0% {opacity:0.6;}
+  100% {opacity:1;}
+}
+
+
+
+
+.img{
+  width: 25px;
+  height: 25px;
+    padding: 1px;
+    margin-left: 15px;
+    border-radius: 20px;
+    background-color:aquamarine;
+}
+#runner{
+  /* background: url('../images/walk-unscreen.gif'); */
+  background-image: url("../images/hhhh.png");
+  background-repeat: no-repeat;
+  width: 600px;
+  height: 600px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+    right: -20px;
+    bottom: 20px;
+
+}
+/* #runner:hover{
+  animation: walking 3s infinite steps(24) ;
+              /* forward 5s linear infinite; */
+  
+
+/* @keyframes walking {
+    0%{
+      background-position: 0px;
+    }
+    100%{
+      background-position: -8664px;
+    }
+  } */
+
+/* @keyframes forward {
+  0%{
+    transform: translateX(0px);
+  }
+  100%{
+    transform: translateX(1200px);
+  }
+} */
+
+
+.centerText{
+  
+  
+  /* background-color: white; */
+    width: 70vh;
+  height: 60vh;
+  /* background-color: aqua  ; */
+  position: absolute;
+  left: 30vh;
+  top: 25vh ;
+  font-size: 70px;
+  overflow: hidden;
+  font-weight: 800;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+
+  
+  -webkit-text-stroke: 2px black;
+   color: rgb(200, 195, 195);
+   text-shadow:
+       3px 3px 0 #000,
+     -1px -1px 0 #000,  
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+       1px 1px 0 #000;
+
+}
+/* 1000 690 */
+
+@media (max-width: 1000px) {
+  /* mobile CSS: hide .desktop div */
+  .centerText {
+    display: none;
+  }
+}
+
+
+.right{
+  position: absolute;
+  right: 20px;
+  top: 35px;
+}
+
+.logIn{
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+
+}
+
+.signUp:hover,.logIn:hover{
+  background-color: aliceblue;
+}
+
+
+
+.signUp{
+  margin-left: 10px;
+  padding: 10px;
+  border: 0.4px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+.loader{
+    margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* background-color: #2980b9; */
+  z-index: 1;
+}

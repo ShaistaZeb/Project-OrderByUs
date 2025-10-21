@@ -1,0 +1,15 @@
+.formContainer{
+    background-color: aqua;
+    margin: 100px;
+    padding: 30px;
+}
+
+.mb_3{
+    padding: 20px;
+}
+
+.submit{
+    background-color: black;
+    color: white;
+    padding: 10px;
+}

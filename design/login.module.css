@@ -1,0 +1,253 @@
+.body{
+    
+    position: absolute;
+    top: 8vh;
+    left: 50%;
+    /* transform: translate(-50%, -50%); */
+    transform: translateX(-50%);
+    padding: 50px;
+    border: 0.1px solid black;
+    border-radius: 12px;
+    width: 380px !important;
+    /* margin-bottom: 300px; */
+}
+
+
+.head{
+    text-align: center;
+    font-size: large;
+    padding: 15px 30px 10px 30px;
+    font-size: 30px;
+}
+
+.description{
+  text-align: center;
+  color: gray;
+  margin-bottom: 18px;
+}
+
+.icon{
+    position: absolute;
+    font-size: 30px;
+    padding-top: 10px;
+    
+}
+.text{
+    border: none;
+	border-bottom: 2px solid #D1D1D4;
+	background: none;
+	padding: 10px;
+	padding-left: 35px;
+	font-weight: 700;
+	width: 75%;
+	transition: .2s;
+    width: 100%;
+    outline: none;
+    
+}
+
+.text:active,
+.text:focus,
+.text:hover {
+	outline: none;
+	border-bottom-color: gray;
+}
+
+.rightIcon{
+    position: absolute;
+    right: 0;
+    margin-right: 50px;
+    font-size: 30px;
+    padding-top: 10px;
+}
+.login ,.password{
+    margin-bottom: 15px;
+}
+
+.password2{
+    margin-bottom: 40px;
+}
+
+
+.button{
+  position: relative;
+  background-color: rgba(232 ,156, 7,0.9);
+  color: black;
+  border-radius: 4em;
+  font-size: 16px;
+  /* color: white; */
+  padding: 0.8em 1.8em;
+  padding-bottom: 15px;
+  cursor:pointer;
+  user-select:none;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s; /* Safari */
+}
+
+.button:hover {
+  transition-duration: 0.1s;
+  background-color: rgba(232 ,156, 7,0.6);
+  color: aliceblue;
+}
+
+.button:after {
+  content: "";
+  display: block;
+  position: absolute;
+  border-radius: 4em;
+  left: 0;
+  top:0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.5s;
+  box-shadow: 0 0 15px 40px white;
+}
+
+.button:active:after {
+  box-shadow: 0 0 0 0 white;
+  position: absolute;
+  border-radius: 4em;
+  left: 0;
+  top:0;
+  opacity: 1;
+  transition: 0s;
+}
+
+.button:active {
+  top: 1px;
+}
+
+.arrow{
+    padding-top: 5px;
+    margin-left: 190px;
+    font-size: 20px;
+}
+
+
+.foot{
+    padding: 30px;
+    text-align: center;
+    border-bottom: 0.1px solid gray;
+}
+
+.options{
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+
+.register,.signin{
+  font-weight:lighter;
+  margin-left: 20px;
+  font-family: sans-serif;
+  font-size:medium;
+}
+
+
+.register,.signin {
+  display: inline-block;
+  position: relative;
+}
+
+.register:after,.signin:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: 0;
+  left: 0; 
+  background-color: rgb(30, 30, 29);
+  /* background-color: #0087ca; */
+  transform-origin: bottom right;
+  transition: transform 0.5s ease-out;
+}
+
+.register:hover:after , .signin:hover:after{
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.fp{
+  text-align: end;
+  margin-bottom: 15px;
+  color: rgb(156, 156, 223);
+  cursor: pointer;
+}
+.loader{
+  user-select: none;
+  width:100%;
+  /* height:20px; */
+  height: 25px;
+  /* background-color: rgb(88, 88, 88); */
+  color: white;
+  /* box-shadow: 0 0 15px 40px white; */
+}
+
+/* Media Query for Mobile Devices */
+        @media (max-width: 480px) {
+            .body {
+                width: 400px;
+            }
+        }
+          
+        /* Media Query for low resolution  Tablets, Ipads */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .body {
+                width: 450px;
+            }
+        }
+          
+        /* Media Query for Tablets Ipads portrait mode */
+        @media (min-width: 768px) and (max-width: 1024px){
+            .body {
+                width: 500px;
+            }
+        }
+          
+        /* Media Query for Laptops and Desktops */
+        @media (min-width: 1025px) and (max-width: 1280px){
+            .body {
+                width: 500px;
+            }
+        }
+          
+        /* Media Query for Large screens */
+        @media (min-width: 1281px) {
+            .body {
+                width: 500px;
+            }
+        }
+
+.home{
+  display: flex;
+  /* align-items: center; */
+  justify-content: center ;
+  /* justify-items: center; */
+  padding: 2px;
+  /* border: 0.001px solid black; */
+  margin-bottom: 5px;
+  /* width: fit-content; */
+}
+.home:hover{
+  transition: 500ms;
+  /* background-color: rgba(232 ,156, 7,0.9); */
+  color: gray;
+  cursor: pointer;
+}
+.iconn{
+  padding: 5px !important;
+  margin: 0px !important;
+  font-size: 30px;
+}
+.homee{
+  font-size: medium;
+  padding: 5px;
+  padding-left: 0px;
+}

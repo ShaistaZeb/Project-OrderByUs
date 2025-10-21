@@ -1,0 +1,106 @@
+.add{
+
+    position: absolute;
+    top:7vh;
+    right: 0;
+
+   
+    line-height: 50px;
+    padding: 20px;
+    text-align: center;
+    
+}
+.description{
+    position: absolute;
+  top: 0;
+  padding-top:20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* background: rgb(148, 139, 139); */
+  color: black;
+  visibility: hidden;
+  opacity: 0;
+  border-radius: 20px;
+
+  /* transition effect. not necessary */
+  transition: opacity .2s, visibility .2s;
+}
+
+
+
+.add:hover .icon{
+    filter: blur(10px);
+}
+.add:hover  .description{
+    
+     visibility: visible;
+  opacity: 1;
+  justify-content: center;
+     
+}
+.icon{
+    /* background-color: beige; */
+    padding: 15px;
+    margin-right: 10px;
+    margin-left: 30px; 
+    border-radius: 10px;
+    /* background-color: rgb(140, 140, 140); */
+    border: 0.1px solid black;
+    /* color: white; */
+    font-weight: bolder;
+    font-size: large;
+    
+}
+
+.list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* position: absolute; */
+    /* z-index: -1; */
+}
+
+.popUp{
+    position: absolute;
+    left: 50%;
+    top: 50vh;
+    transform: translate(-50%,-50%);
+    
+   
+    /* max-height: 10000px; */
+    width: 350px;
+    padding: 30px;
+    border: 0.1px solid black;
+    box-shadow: 1px 1px 3px 3px rgb(209, 208, 208);
+    background-color: white;
+
+    
+  scroll-behavior: smooth;
+  /* width: 100px; */
+  overflow-y: scroll;
+
+  /* height: 300px; */
+    visibility: hidden;
+
+  
+}
+.loader{
+   /* background-color: black;
+   color: black;
+   width: 100%;
+   height:70vh; */
+}
+.network{
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* background-color: rgb(250, 111, 111); */
+    /* width: 300px; */
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+}

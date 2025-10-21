@@ -1,0 +1,17 @@
+.title{
+    width: 45%;
+}.image{
+    text-align: center;
+    margin-bottom: 10px;
+
+    
+}.foot{
+    margin: 40px;
+    display: flex;
+    justify-content: center;
+    height: 200px;
+    width: 200px;
+}.head{
+    display: flex;
+    justify-content: center ;
+}
