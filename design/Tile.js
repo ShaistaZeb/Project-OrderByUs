@@ -3,7 +3,7 @@ import { AiOutlineArrowUp } from "react-icons/ai";
 import {AiOutlineArrowDown} from "react-icons/ai";
 import { useEffect, useState } from "react";
 import styles from "./Tile.module.css";
-import { userAccessToken, fetchUser } from "../utils/fetchDetails";
+import { userAccessToken, fetchUser, getIdToken } from "../utils/fetchDetails";
 import 'firebase/firestore'
 import { db, deleteDoc, doc, setDoc, updateDoc, getDocs, collection, getDoc } from "firebase/firestore";
 import { database } from "../firebase-config";
@@ -78,11 +78,11 @@ function Tile(props) {
 
   }
 
-  const sendmail = ()=>{
+  const sendmail = async ()=>{
     let name = props.orderid;
     let email = props.uid;
     let message = `Your Order ${props.orderid} of cost ₹${cost} has been taken up by ${user?.uid}.
-          click on orderbyus.herokuapp.com/ongoingOrders for more details
+          click on ${window.location.origin}/ongoingOrders for more details
 
           Thank You..
           `
@@ -91,11 +91,13 @@ function Tile(props) {
       email,
       message
     }
+    const idToken = await getIdToken();
     fetch('/api/contact', {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
       },
       body: JSON.stringify(data)
     }).then((res) => {

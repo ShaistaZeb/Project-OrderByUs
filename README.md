@@ -32,3 +32,28 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Deployment
+
+The app is hosted on Vercel and deploys automatically:
+
+- Push to `main`: production deploy.
+- Open a pull request: preview deploy with its own URL.
+- GitHub Actions (`.github/workflows/ci.yml`) runs lint and build on every push and PR.
+
+### One-time setup
+
+1. Create a Firebase project. Enable Authentication (Email/Password, Google, Phone) and Firestore.
+2. Copy the web app config from Firebase > Project settings > Your apps.
+3. Publish `firestore.rules` (paste into Firestore > Rules, or run `firebase deploy --only firestore:rules`).
+4. Create a Gmail account for the app, turn on 2-step verification, and create an App Password.
+5. Import this repo at vercel.com/new and add every variable from `.env.example` under Settings > Environment Variables.
+6. Add the Vercel domain to Firebase > Authentication > Settings > Authorized domains.
+
+### Local development
+
+```bash
+cp .env.example .env.local   # fill in the values
+npm install
+npm run dev
+```

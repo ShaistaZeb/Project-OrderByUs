@@ -1,41 +1,30 @@
-export default function (req, res) {
+import { verifyUser, escapeHtml, createTransporter } from "../../utils/mailer";
 
+export default async function (req, res) {
+    if (req.method !== "POST") return res.status(405).end();
 
-    let nodemailer = require('nodemailer')
+    const user = await verifyUser(req);
+    if (!user) return res.status(401).end();
 
+    const { message } = req.body || {};
+    if (!message) return res.status(400).end();
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        port: 465,
-        secure: true,
-        auth: {
-            user: 'orderbyus17@gmail.com',
-            pass: "uajfvoanqycsyfkf",
-        },
-    });
+    const sender = user.email || user.phoneNumber || user.localId;
     const mailData = {
-        from: 'orderbyus17@gmail.com',
-        to: 'orderbyus17@gmail.com',
+        from: process.env.GMAIL_USER,
+        to: process.env.GMAIL_USER,
+        replyTo: user.email,
         subject: `Report`,
-        text: req.body.message + " | Sent from: " + "req.body.email",
-
-        html: `<div>${req.body.message}</div><p>Sent from:
-    "req.body.email"</p>`
+        text: message + " | Sent from: " + sender,
+        html: `<div>${escapeHtml(message)}</div><p>Sent from: ${escapeHtml(sender)}</p>`,
     }
 
-    transporter.sendMail(mailData, async function (err, info) {
-        if (err)
-        {
-            console.log(err, "here");
-            return await res.status(201).end();
-        }
-            
-        else
-        {
-            console.log(info, "yes")
-            return await res.status(202).end();
-        }
-            
-    })
-    // return res.status(200).end();
+    // the report page treats 202 as sent and 201 as failed
+    try {
+        await createTransporter().sendMail(mailData);
+        return res.status(202).end();
+    } catch (err) {
+        console.log(err);
+        return res.status(201).end();
+    }
 }

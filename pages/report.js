@@ -1,4 +1,5 @@
 import { useState,useEffect } from 'react';
+import { getIdToken } from '../utils/fetchDetails';
 
 
 function Report() {
@@ -20,7 +21,7 @@ function Report() {
   }, [])
   
   
-  const sendmail = () => {
+  const sendmail = async () => {
     
     
     let email = emaill;
@@ -29,11 +30,13 @@ function Report() {
       email,
       message
     }
+    const idToken = await getIdToken();
     fetch('/api/report_mail', {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
       },
       body: JSON.stringify(data)
     }).then((res) => {

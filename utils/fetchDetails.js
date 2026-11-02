@@ -15,3 +15,16 @@ export const userAccessToken = () => {
 
   return accessToken;
 };
+
+// Waits for Firebase to restore the session, then returns a fresh ID token.
+export const getIdToken = async () => {
+  const { authentication } = await import("../firebase-config");
+  const { onAuthStateChanged } = await import("firebase/auth");
+  const user = await new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(authentication, (u) => {
+      unsubscribe();
+      resolve(u);
+    });
+  });
+  return user ? user.getIdToken() : null;
+};

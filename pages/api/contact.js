@@ -1,33 +1,27 @@
-export default function (req, res) {
+import { verifyUser, escapeHtml, createTransporter } from "../../utils/mailer";
 
+export default async function (req, res) {
+    if (req.method !== "POST") return res.status(405).end();
 
-    let nodemailer = require('nodemailer')
+    const user = await verifyUser(req);
+    if (!user) return res.status(401).end();
 
+    const { name, email, message } = req.body || {};
+    if (!email || !message) return res.status(400).end();
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        port: 465,
-        secure: true,
-        auth: {
-            user: 'orderbyus17@gmail.com',
-            pass: "uajfvoanqycsyfkf",
-        },
-    });
     const mailData = {
-        from: 'orderbyus17@gmail.com',
-        to: req.body.email,
-        subject: `Your Order ${req.body.name} has been takenUp`,
-        text: req.body.message + " | Sent from: " + "orderbyus.herokuapp.com",
-
-        html: `<div>${req.body.message}</div><p>Sent from:
-    "orderbyus.herokuapp.com"</p>`
+        from: process.env.GMAIL_USER,
+        to: email,
+        subject: `Your Order ${name} has been takenUp`,
+        text: message,
+        html: `<div>${escapeHtml(message).replace(/\n/g, "<br>")}</div>`,
     }
 
-    transporter.sendMail(mailData, function (err, info) {
-        if (err)
-            console.log(err, "here");
-        else
-            console.log(info, "yes")
-    })
-    res.status(200)
+    try {
+        await createTransporter().sendMail(mailData);
+        return res.status(200).end();
+    } catch (err) {
+        console.log(err);
+        return res.status(500).end();
+    }
 }

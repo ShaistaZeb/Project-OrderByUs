@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users live in "database"; each user's orders live in a collection named
+    // after their uid. Any signed-in user can see and take up orders, so access
+    // is limited to signed-in users rather than to the owner.
+    match /{collectionId}/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
