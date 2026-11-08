@@ -141,6 +141,8 @@ function PopUp(props) {
             takenUp: takenUp,
             delivered: delivered,
             uid: uid,
+            // The customer's email, so the server can notify them when an agent takes the order.
+            email: authentication.currentUser?.email || null,
             mobile: number,
             paid: false,
             terms_and_conditions: false,

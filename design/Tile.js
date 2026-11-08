@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import styles from "./Tile.module.css";
 import { userAccessToken, fetchUser, getIdToken } from "../utils/fetchDetails";
 import 'firebase/firestore'
-import { db, deleteDoc, doc, setDoc, updateDoc, getDocs, collection, getDoc } from "firebase/firestore";
+import { db, deleteDoc, doc, setDoc, updateDoc, getDocs, collection, getDoc, runTransaction } from "firebase/firestore";
 import { database } from "../firebase-config";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { useRouter } from "next/router";
@@ -29,7 +29,15 @@ function Tile(props) {
 
       if (user?.uid != props.uid && cost) {
         try {
-          await updateDoc(doc(database, props.uid, props.orderid), {
+          // Claim inside a transaction: it reads the order and only takes it if nobody else has,
+          // so two agents tapping "Take up" at once can't both get it.
+          const orderRef = doc(database, props.uid, props.orderid);
+          await runTransaction(database, async (tx) => {
+            const snap = await tx.get(orderRef);
+            if (!snap.exists() || snap.data().takenUp !== 0) {
+              throw new Error("This order has already been taken up.");
+            }
+            tx.update(orderRef, {
             // order_id: props.orderid,
             // location: props.location,
             agent_id: user?.uid,
@@ -44,11 +52,12 @@ function Tile(props) {
             // uid: props.uid,
             mobile: number,
             // paid:props.paid
-          })
+            });
+          });
 
 
-          //sending mail to the user
-          sendmail();
+          // Email the customer, and wait for it, so the reload below can't cancel the request.
+          await sendmail().catch(() => {});
           //
 
 
@@ -57,7 +66,7 @@ function Tile(props) {
            router.reload(window.location.pathname);
 
         } catch (error) {
-          alert(error);
+          alert(error.message || error);
         }
       }
       else {
@@ -79,20 +88,13 @@ function Tile(props) {
   }
 
   const sendmail = async ()=>{
-    let name = props.orderid;
-    let email = props.uid;
-    let message = `Your Order ${props.orderid} of cost ₹${cost} has been taken up by ${user?.uid}.
-          click on ${window.location.origin}/ongoingOrders for more details
-
-          Thank You..
-          `
+    // The server looks up the order, checks this agent claimed it, and emails its owner.
     let data = {
-      name,
-      email,
-      message
+      ownerUid: props.uid,
+      orderId: props.orderid,
     }
     const idToken = await getIdToken();
-    fetch('/api/contact', {
+    return fetch('/api/contact', {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',

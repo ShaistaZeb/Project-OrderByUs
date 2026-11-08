@@ -1,9 +1,14 @@
 import { firebaseConfig } from "../firebase-config";
 
+// The Firebase ID token from an "Authorization: Bearer <token>" header, or null.
+export const bearerToken = (req) => {
+  const header = req.headers.authorization || "";
+  return header.startsWith("Bearer ") ? header.slice(7) : null;
+};
+
 // Checks the Firebase ID token sent by the client. Returns the user or null.
 export const verifyUser = async (req) => {
-  const header = req.headers.authorization || "";
-  const idToken = header.startsWith("Bearer ") ? header.slice(7) : null;
+  const idToken = bearerToken(req);
   if (!idToken) return null;
 
   const res = await fetch(
