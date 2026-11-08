@@ -76,11 +76,6 @@ const NavBar = (props) => {
                 About
               </a>
             </Link>
-            <Link href="/home.html/#teamid">
-              <a className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-sm text-gray-600 items-center justify-center hover:bg-gray-50 hover:text-gray-600">
-                Team
-              </a>
-            </Link>
             <Link href="/home.html/#contactid">
               <a className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-sm text-gray-600 items-center justify-center hover:bg-gray-50 hover:text-gray-600">
                 Contact
