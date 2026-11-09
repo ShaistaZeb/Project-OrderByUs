@@ -8,7 +8,7 @@
     "lint": "next lint"
   },
   "engines": {
-    "node": "20.x"
+    "node": "26.x"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
