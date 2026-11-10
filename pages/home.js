@@ -22,7 +22,7 @@ const Home = () => {
 
     function change() {
 
-      location.href = "/home.html";
+      location.href = "/welcome.html";
       setLoader(false);
       clearInterval(change);
 
