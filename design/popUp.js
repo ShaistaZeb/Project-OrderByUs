@@ -1,557 +1,548 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import styles from "../styles/popUp.module.css";
-import { useState, useEffect } from "react";
-import { userAccessToken, fetchUser } from "../utils/fetchDetails";
-import "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import {
-  db,
-  deleteDoc,
-  doc,
-  setDoc,
-  updateDoc,
-  getDocs,
-  collection,
-  getDoc,
-} from "firebase/firestore";
-import { AiOutlinePlusCircle, AiFillDelete } from "react-icons/ai";
-import { database } from "../firebase-config";
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+  AiOutlinePlusCircle,
+  AiFillDelete,
+  AiOutlineCheck,
+  AiOutlineClose,
+} from "react-icons/ai";
+import { database, authentication } from "../firebase-config";
+import {
+  RecaptchaVerifier,
+  linkWithPhoneNumber,
+  onAuthStateChanged,
+} from "firebase/auth";
 
-import { authentication } from "../firebase-config";
-import Image from "next/image";
-
-import chickenbiryani from "../public/images/biryani.jpg";
-import { useRouter } from "next/router";
 function PopUp(props) {
-  const router = useRouter();
-  const [user, setUser] = useState(null);
   const [number, setNumber] = useState("");
   const [verified, setVerified] = useState(false);
   const [Number, setnumber] = useState("");
   const [expandForm, setExpandForm] = useState(false);
-
   const [disable, setDisable] = useState(true);
-  let uidd = "";
-  const [showModal, setShowModal] = useState(false);
+  const [OTP, setOTP] = useState("");
+  const [suggestionList, setsuggestionList] = useState([]);
+  const [orderList, setorderList] = useState([]);
+  const [fc, setfc] = useState(0);
+
   useEffect(() => {
-    const accessToken = userAccessToken();
-    if (accessToken) {
-      const [userInfo] = fetchUser();
-    }
-
-    setUser(userInfo);
-    uidd = userInfo?.uid;
-
-    const fetchNumber = async () => {
-
-      try {
-        // var l = [];
-        var l = [];
-        const querySnapshot = await getDocs(collection(database, "database"));
-
-        if (querySnapshot.size)
-          querySnapshot.forEach(async (doc) => {
-            l.push(doc.data());
-            // doc.data() is never undefined for query doc snapshots
-            // var q = await getDocs(collection(database,doc.id));
-            // 
-
-
-          });
-
-        //   
-        l.map(async () => {
-
-          let uid;
-          let number;
-          for (let i = 0; i < l.length; i++) {
-            if (l[i]?.uid == userInfo?.uid) {
-              uid = l[i]?.uid;
-              number = l[i]?.number;
-              break;
-            }
-          }
-
-          if (uid == userInfo?.uid) {
-
-            if (number != 0) {
-              setnumber(number);
-              setNumber(number);
-              setVerified(true);
-
-            } else {
-
-
-              // alert("plz enter ur mobile number for secure communications");
-            }
-          }
-        });
-      } catch (error) {
-
+    const unsubscribe = onAuthStateChanged(authentication, (currentUser) => {
+      if (!currentUser) {
+        setVerified(false);
+        setNumber("");
+        setnumber("");
+        return;
       }
-    };
-    fetchNumber();
+
+      if (currentUser.phoneNumber) {
+        setNumber(currentUser.phoneNumber);
+        setnumber(currentUser.phoneNumber);
+        setVerified(true);
+        setDisable(true);
+        setExpandForm(false);
+      } else {
+        setVerified(false);
+        setnumber("");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const placeOrder = async () => {
-    if (verified) {
-      var location = document.getElementById("areas").value;
-      const uid = user?.uid;
-      var today = new Date();
+    const currentUser = authentication.currentUser;
 
-      var md5 = require("md5");
-      var order_id = md5(uid + today);
-      var user_id = md5(uid);
-      var agent_id = null;
-      var finalCost = fc;
-      var list = [...orderList];
-      var takenUp = 0;
-      var delivered = 0;
-      var time =
-        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      // 
-      var date =
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate();
-      // 
-      if (finalCost > 0) {
+    if (!currentUser) {
+      alert("Please log in before placing an order.");
+      return;
+    }
 
-        var md5 = require("md5");
+    if (!currentUser.phoneNumber) {
+      setVerified(false);
+      alert("Please link and verify your mobile number before placing an order.");
+      return;
+    }
 
-        //sending data to firebase
-        try {
-          // await setDoc(doc(database,"database", uid), {
-          //     uid:uid,
-          //     number:null,
-          // });
-          await setDoc(doc(database, uid, order_id), {
-            order_id: order_id,
-            location: location,
-            agent_id: agent_id,
-            user_id: user_id,
-            finalCost: finalCost,
-            orderList: orderList,
-            date: date,
-            time: time,
-            cost: 0,
-            takenUp: takenUp,
-            delivered: delivered,
-            uid: uid,
-            // The customer's email, so the server can notify them when an agent takes the order.
-            email: authentication.currentUser?.email || null,
-            mobile: number,
-            paid: false,
-            terms_and_conditions: false,
-            agent_accept: false,
-          });
+    const location = document.getElementById("areas")?.value;
+    const uid = currentUser.uid;
+    const today = new Date();
 
-          // await updateDoc(doc(database,title,"L"),{
-          //     name:"Hell"
-          // })
-          // await deleteDoc(doc(database,title,"L"),{
+    const md5 = require("md5");
+    const order_id = md5(uid + today);
+    const user_id = md5(uid);
+    const finalCost = fc;
 
-          // })
-          props.props();
-          // setShowModal(true)
-          // alert("success");
-          // router.reload(window.location.pathname);
-          window.location.href = window.location.pathname + "?" + "t"
-          // router.reload({
-          //   pathname: '/activeOrders',
-          //   query: { page: 't' }
-          // }, '/activeOrders')
-        } catch (error) {
+    const time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
-          alert(error);
-        }
-      } else {
-        alert("cannot place order");
-      }
-    } else {
-      alert("mobile verification required");
+    const date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+
+    if (finalCost <= 0 || orderList.length === 0) {
+      alert("Please add at least one item before placing your order.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(database, uid, order_id), {
+        order_id: order_id,
+        location: location,
+        agent_id: null,
+        user_id: user_id,
+        finalCost: finalCost,
+        orderList: orderList,
+        date: date,
+        time: time,
+        cost: 0,
+        takenUp: 0,
+        delivered: 0,
+        uid: uid,
+        email: currentUser.email || null,
+        mobile: currentUser.phoneNumber,
+        paid: false,
+        terms_and_conditions: false,
+        agent_accept: false,
+      });
+
+      props.props();
+      window.location.href = window.location.pathname + "?t";
+    } catch (error) {
+      console.error("Place order error:", error);
+      alert(error.message || "Unable to place order. Please try again.");
     }
   };
-  //searching items
-  let itemsList = [
-    { title: "Chicken Biryani", cost : 170, urll:""},
-{ title: "Veg Biryani", cost: 90, urll:"" },
 
-{ title: "Egg Manchuria i", cost: 70, urll:"" },
-
-{ title: "Veg Manchuria ", cost: 60, urll:"" },
-
-{ title: "Chicken Manchurian", cost: 120, urll:"" },
-
-{ title: "Chilly Chicken ", cost: 120, urll:"" },
-
-{ title: "Egg Noodles", cost: 70, urll:"" },
-
-{ title: "Egg Rice", cost: 60, urll:"" },
-{ title: "Chicken Rice", cost: 90, urll:"" },
-{ title: "Chicken Pakodi", cost: 70, urll:"" },
-{ title: "Masala Dosa ", cost: 40, urll:"" },
-{ title: "Onion Dosa", cost: 40, urll:"" },
-{ title: "Plain Dosa", cost: 30, urll:"" },
-{ title: "Mirchi ", cost: 20, urll:"" },
-
-{ title: "Alu bajji ", cost: 20, urll:"" },
-{ title: "Egg Bajji ", cost: 30, urll:"" },
-
-{ title: "Pepsi - 20rs", cost: 20, urll:"" },
-{ title: "Pepsi - 40rs", cost: 40, urll:"" },
-
-{ title: "Pepsi - 60rs", cost: 60, urll:"" },
-{ title: "Mountain Dew - 20rs", cost: 20, urll:"" },
-
-{ title: "Mountain Dew - 40rs", cost: 40, urll:"" },
-{ title: "Mountain Dew - 60rs", cost: 60, urll:"" },
-
-{ title: "Coke - cola - 20rs", cost: 20, urll:"" },
-{ title: "Sting", cost: 20, urll:"" },
-{ title: "Pulpy Orange", cost: 20, urll:"" },
-{ title: "Limca ", cost: 20, urll:"" },
-{ title: "Water bottle ", cost: 20, urll:"" },
-{ title: "Pineapple", cost: 20, urll:"" },
-
-{ title: "Black Grapes ", cost: 30, urll:"" },
-{ title: "Muskmelon ", cost: 30, urll:"" },
-
-{ title: "Pineapple", cost: 20, urll:"" },
-
-{ title: "Pineapple", cost: 20, urll:"" },
-
-{ title: "Pineapple", cost: 20, urll:"" },
-
+  // Searching items
+  const itemsList = [
+    { title: "Chicken Biryani", cost: 170, urll: "" },
+    { title: "Veg Biryani", cost: 90, urll: "" },
+    { title: "Egg Manchuria i", cost: 70, urll: "" },
+    { title: "Veg Manchuria ", cost: 60, urll: "" },
+    { title: "Chicken Manchurian", cost: 120, urll: "" },
+    { title: "Chilly Chicken ", cost: 120, urll: "" },
+    { title: "Egg Noodles", cost: 70, urll: "" },
+    { title: "Egg Rice", cost: 60, urll: "" },
+    { title: "Chicken Rice", cost: 90, urll: "" },
+    { title: "Chicken Pakodi", cost: 70, urll: "" },
+    { title: "Masala Dosa ", cost: 40, urll: "" },
+    { title: "Onion Dosa", cost: 40, urll: "" },
+    { title: "Plain Dosa", cost: 30, urll: "" },
+    { title: "Mirchi ", cost: 20, urll: "" },
+    { title: "Alu bajji ", cost: 20, urll: "" },
+    { title: "Egg Bajji ", cost: 30, urll: "" },
+    { title: "Pepsi - 20rs", cost: 20, urll: "" },
+    { title: "Pepsi - 40rs", cost: 40, urll: "" },
+    { title: "Pepsi - 60rs", cost: 60, urll: "" },
+    { title: "Mountain Dew - 20rs", cost: 20, urll: "" },
+    { title: "Mountain Dew - 40rs", cost: 40, urll: "" },
+    { title: "Mountain Dew - 60rs", cost: 60, urll: "" },
+    { title: "Coke - cola - 20rs", cost: 20, urll: "" },
+    { title: "Sting", cost: 20, urll: "" },
+    { title: "Pulpy Orange", cost: 20, urll: "" },
+    { title: "Limca ", cost: 20, urll: "" },
+    { title: "Water bottle ", cost: 20, urll: "" },
+    { title: "Pineapple", cost: 20, urll: "" },
+    { title: "Black Grapes ", cost: 30, urll: "" },
+    { title: "Muskmelon ", cost: 30, urll: "" },
+    { title: "Pineapple", cost: 20, urll: "" },
+    { title: "Pineapple", cost: 20, urll: "" },
+    { title: "Pineapple", cost: 20, urll: "" },
   ];
 
-const [suggestionList, setsuggestionList] = useState([]);
-const [orderList, setorderList] = useState([]);
-const [fc, setfc] = useState(0);
-const addThisItem = () => {
-  let list = [...orderList];
+  const addThisItem = () => {
+    const list = [...orderList];
+    const input = document.getElementById("inputSearch");
+    const text = input.value;
+    input.value = "";
 
-  setorderList(list);
-  var text = document.getElementById("inputSearch").value;
-  document.getElementById("inputSearch").value = "";
-  var c = 0;
-  itemsList.map(({ cost, title }) => {
-    if (title == text) {
-      c = cost;
+    const selectedItem = itemsList.find((item) => item.title === text);
+
+    if (selectedItem) {
+      list.push({
+        name: text,
+        cost: selectedItem.cost,
+        availability: 0,
+      });
+
+      setorderList(list);
+      setfc(Math.trunc(fc + selectedItem.cost * 1.1));
     }
-  });
-  if (c != 0) {
-    list.push({ name: text, cost: c, availability: 0 });
-    setorderList(list);
-  }
-  setorderList(list);
 
+    setsuggestionList([]);
+  };
 
-  var intvalue = Math.trunc(fc + (c * 0.1) + c)
-  setfc(intvalue);
-  setsuggestionList([]);
-};
-const fillInput = (item) => {
-  setsuggestionList([]);
-  document.getElementById("inputSearch").value = item;
-  addThisItem();
-};
+  const fillInput = (item) => {
+    setsuggestionList([]);
+    document.getElementById("inputSearch").value = item;
+    addThisItem();
+  };
 
-const inputFunction = () => {
-  suggestionList = [];
-  // console.clear();
-  var text = document.getElementById("inputSearch").value;
-  text = text.trim();
-  text = text.toLowerCase();
-  itemsList.map((item) => {
-    if (item.title.toLowerCase().match(text) && text != "") {
-      if (suggestionList.indexOf(item.title) < 0) {
-        suggestionList.push(item);
+  const inputFunction = () => {
+    const matches = [];
+    const text = document
+      .getElementById("inputSearch")
+      .value.trim()
+      .toLowerCase();
+
+    itemsList.forEach((item) => {
+      if (
+        text &&
+        item.title.toLowerCase().includes(text) &&
+        !matches.some((match) => match.title === item.title)
+      ) {
+        matches.push(item);
       }
-      setsuggestionList(suggestionList);
+    });
 
+    setsuggestionList(matches);
+  };
 
+  let toggle = 0;
+
+  function myFunction(index) {
+    const popup = document.getElementById("myPopup" + index);
+
+    if (toggle % 2 === 0) {
+      popup.style.cssText = "visibility: visible;";
+    } else {
+      popup.style.cssText = "visibility: hidden;";
     }
 
-    // else{
-    //     
-    // }
-  });
-  setsuggestionList(suggestionList);
-
-
-};
-
-let toggle = 0;
-function myFunction(index) {
-  var popup = document.getElementById("myPopup" + index);
-  if (toggle % 2 == 0) {
-    popup.style.cssText = `visibility: visible;`;
-  } else {
-    popup.style.cssText = `visibility: hidden;`;
+    toggle++;
   }
-  toggle++;
 
+  const addAgain = (index) => {
+    const list = [...orderList];
+    const item = list[index];
 
-}
-function fun() {
-  var popup = document.getElementById("hi");
-  popup.style.cssText = "color:black";
-}
+    if (!item) return;
 
-const addAgain = (index) => {
-  var list = [...orderList];
-  list.push(list[index]);
-  setorderList(list);
-  var intvalue = Math.trunc(fc + list[index]["cost"] + list[index]["cost"] * 0.1)
+    list.push(item);
+    setorderList(list);
+    setfc(Math.trunc(fc + item.cost * 1.1));
+  };
 
-  setfc(intvalue);
-};
-const deleteItem = (index) => {
-  var list = [...orderList];
-  if (index > -1) {
-    list.splice(index, 1); // 2nd parameter means remove one item only
-  }
-  setorderList(list);
-  var intvalue = Math.trunc(fc - (orderList[index]["cost"] + (orderList[index]["cost"] * 0.1)))
-  setfc(intvalue);
-};
+  const deleteItem = (index) => {
+    const item = orderList[index];
 
-const disableControl = (e) => {
-  if (disable) {
-    setDisable(false);
-  } else {
-    setExpandForm(true);
-    requestOTP(e);
-  }
-};
-const countryCode = "+91";
-const [OTP, setOTP] = useState("");
+    if (!item) return;
 
-const generateRecaptcha = () => {
-  window.recaptchaVerifier = new RecaptchaVerifier(
-    "recaptcha-container",
-    {
-      size: "invisible",
-      callback: (response) => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-        // onSignInSubmit();
+    const list = [...orderList];
+    list.splice(index, 1);
+    setorderList(list);
+    setfc(Math.max(0, Math.trunc(fc - item.cost * 1.1)));
+  };
 
+  const disableControl = (e) => {
+    if (verified && authentication.currentUser?.phoneNumber) {
+      alert("Your phone number is already linked and verified.");
+      return;
+    }
+
+    if (disable) {
+      setDisable(false);
+    } else {
+      setExpandForm(true);
+      requestOTP(e);
+    }
+  };
+
+  const generateRecaptcha = () => {
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+    }
+
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: () => {},
       },
-    },
-    authentication
-  );
-};
+      authentication
+    );
+  };
 
-const requestOTP = (e) => {
-  let phoneNumber = number;
-  if(phoneNumber.substring(0,3) != "+91"){
-    phoneNumber = "+91"+phoneNumber;
-  }
+  const requestOTP = async (e) => {
+    e.preventDefault();
 
-  e.preventDefault();
+    const currentUser = authentication.currentUser;
 
-  if (phoneNumber.length == 10 || phoneNumber.length == 13) {
-    setExpandForm(true);
-    generateRecaptcha();
+    if (!currentUser) {
+      alert("Please log in with your existing account first.");
+      return;
+    }
 
-    let appVerifier = window.recaptchaVerifier;
+    // Do not link the same phone number a second time.
+    if (currentUser.phoneNumber) {
+      setNumber(currentUser.phoneNumber);
+      setnumber(currentUser.phoneNumber);
+      setVerified(true);
+      setDisable(true);
+      setExpandForm(false);
+      alert("Your phone number is already linked and verified.");
+      return;
+    }
 
-    signInWithPhoneNumber(authentication, phoneNumber, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
+    let phoneNumber = number.trim();
 
-        alert("successfully sent");
-      })
-      .catch((error) => {
-        // Error; SMS not sent
-        // ...
+    if (!phoneNumber.startsWith("+91")) {
+      phoneNumber = "+91" + phoneNumber;
+    }
 
+    if (!/^\+91\d{10}$/.test(phoneNumber)) {
+      alert("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
 
-        alert(error);
-      });
-  }
-};
+    try {
+      generateRecaptcha();
 
-const verifyOTP = (e) => {
-  let otp = e.target.value;
-  setOTP(otp);
-  if (otp.length === 6) {
+      const confirmationResult = await linkWithPhoneNumber(
+        currentUser,
+        phoneNumber,
+        window.recaptchaVerifier
+      );
 
-    let confirmationResult = window.confirmationResult;
-    confirmationResult
-      .confirm(otp)
-      .then((result) => {
-        const userr = result.user;
+      window.confirmationResult = confirmationResult;
+      setExpandForm(true);
+      alert("OTP sent successfully.");
+    } catch (error) {
+      console.error("Phone linking error:", error);
+
+      if (
+        error.code === "auth/provider-already-linked" &&
+        authentication.currentUser?.phoneNumber
+      ) {
+        const linkedPhone = authentication.currentUser.phoneNumber;
+        setNumber(linkedPhone);
+        setnumber(linkedPhone);
         setVerified(true);
+        setDisable(true);
         setExpandForm(false);
-        const updateNumber = async () => {
-          // 
-          await setDoc(doc(database, "database", user?.uid), {
-            uid: user?.uid,
-            number: number,
-          });
-        };
-        updateNumber();
-        alert("success logged in");
-      })
-      .catch((error) => {
-        alert("error otp");
-      });
-  }
-};
+        alert("Your phone number is already linked and verified.");
+      } else {
+        alert(error.message || "Unable to send OTP.");
+      }
+    }
+  };
 
-return (
+  const verifyOTP = async (e) => {
+    const otp = e.target.value.trim();
+    setOTP(otp);
 
-  < >
-    <div className={styles.card}>
-      <div className={styles.content}>
-        <span className={styles.close} onClick={props.props}>X</span>
-        <div className={styles.location}>
-          <span className={styles.l}>Location</span>
-          <span className={styles.areas}>
-            <select name="areas" id="areas" className={styles.a}>
-              <option value="BH1">BH1</option>
-              <option value="BH2">BH2</option>
-              <option value="GH1">GH1</option>
-              <option value="GH2">GH2</option>
-              <option value="OBH">OBH</option>
-              <option value="OGH">OGH</option>
-            </select>
-          </span>
-        </div>
-        <div className={styles.mobileNumber}>
-          <span className={styles.mn}>
-            Mobile Number
-          </span>
-          <span>
-            {disable ? <input value={number} placeholder="click on add to enter number" className={styles.numberInputD} onChange={(e) => { setNumber(e.target.value) }} disabled /> : <input value={number} className={styles.numberInput} onChange={(e) => { setNumber(e.target.value) }} />}
+    if (otp.length !== 6) return;
 
-          </span>
+    try {
+      if (!window.confirmationResult) {
+        throw new Error("Please request an OTP first.");
+      }
 
-        </div>
-        <div className={styles.mobileNumber2}>
-          <span className={styles.buttonn} onClick={disableControl}>
-            {Number ? <span>Update</span> : <span>{Number == number ? "Add" : "Get OTP"}</span>}
-          </span>
-          <span className={styles.verified}>{verified ? <AiOutlineCheck /> : <AiOutlineClose />}</span>
-        </div>
+      const result = await window.confirmationResult.confirm(otp);
+      const linkedUser = result.user;
+      const linkedPhone = linkedUser.phoneNumber;
 
-        <div className={styles.OTPArea}>
-          {expandForm ? <div>
-            <span>Enter OTP : </span>
-            <span><input className={styles.numberInput} value={OTP} onChange={verifyOTP} /></span>
-            <span><button className={styles.buttonn}>Submit</button></span>
-          </div> : null}
-          <div id="recaptcha-container"></div>
-        </div>
+      await setDoc(
+        doc(database, "database", linkedUser.uid),
+        {
+          uid: linkedUser.uid,
+          number: linkedPhone,
+        },
+        { merge: true }
+      );
 
-        <div className={styles.searchArea}>
-          <div className={styles.s}>Select Your Orders</div>
-          <span>
-            <input
-              id="inputSearch"
-              type="text"
-              onChange={inputFunction}
-              className={styles.searchInput}
-              placeholder="Search for items.."
-            />
+      setNumber(linkedPhone);
+      setnumber(linkedPhone);
+      setVerified(true);
+      setDisable(true);
+      setExpandForm(false);
+      setOTP("");
+      window.confirmationResult = null;
+
+      alert("Phone number verified and linked successfully.");
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      alert(error.message || "OTP verification failed.");
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.card}>
+        <div className={styles.content}>
+          <span className={styles.close} onClick={props.props}>
+            X
           </span>
 
-          <span className={styles.addS} onClick={addThisItem}>
-            ADD
-          </span>
+          <div className={styles.location}>
+            <span className={styles.l}>Location</span>
+            <span className={styles.areas}>
+              <select name="areas" id="areas" className={styles.a}>
+                <option value="BH1">BH1</option>
+                <option value="BH2">BH2</option>
+                <option value="GH1">GH1</option>
+                <option value="GH2">GH2</option>
+                <option value="OBH">OBH</option>
+                <option value="OGH">OGH</option>
+              </select>
+            </span>
+          </div>
 
-          <div className={styles.mainList}>
-            {suggestionList.map((item) => (
+          <div className={styles.mobileNumber}>
+            <span className={styles.mn}>Mobile Number</span>
+            <span>
+              {disable ? (
+                <input
+                  value={number}
+                  placeholder="click on add to enter number"
+                  className={styles.numberInputD}
+                  onChange={(e) => setNumber(e.target.value)}
+                  disabled
+                />
+              ) : (
+                <input
+                  value={number}
+                  className={styles.numberInput}
+                  onChange={(e) => setNumber(e.target.value)}
+                />
+              )}
+            </span>
+          </div>
 
-              <div className={styles.item}
-                onClick={() => {
-                  fillInput(item.title);
-                }}>
+          <div className={styles.mobileNumber2}>
+            <span className={styles.buttonn} onClick={disableControl}>
+              {verified ? (
+                <span>Verified</span>
+              ) : Number ? (
+                <span>Update</span>
+              ) : (
+                <span>{Number === number ? "Add" : "Get OTP"}</span>
+              )}
+            </span>
 
-                <div className="md:flex items-center py-8 border-t border-gray-200">
-                  {/* <div className="w-1/4">
-                      <Image
-                        src={chickenbiryani}
-                        alt=""
-                        className="w-full h-full object-center object-cover"
-                      />
-                    </div> */}
-                  <div className="md:pl-3 md:w-3/4">
+            <span className={styles.verified}>
+              {verified ? <AiOutlineCheck /> : <AiOutlineClose />}
+            </span>
+          </div>
 
-                    <div className="flex items-center justify-between w-full pt-1">
-                      <p className="text-base font-black leading-none text-gray-800">
-                        {item.title}
-                      </p>
+          <div className={styles.OTPArea}>
+            {expandForm ? (
+              <div>
+                <span>Enter OTP : </span>
+                <span>
+                  <input
+                    className={styles.numberInput}
+                    value={OTP}
+                    onChange={verifyOTP}
+                    inputMode="numeric"
+                    maxLength={6}
+                  />
+                </span>
+              </div>
+            ) : null}
 
-                    </div>
+            <div id="recaptcha-container"></div>
+          </div>
 
+          <div className={styles.searchArea}>
+            <div className={styles.s}>Select Your Orders</div>
 
-                    <div className="flex items-center justify-between pt-5 pr-6">
+            <span>
+              <input
+                id="inputSearch"
+                type="text"
+                onChange={inputFunction}
+                className={styles.searchInput}
+                placeholder="Search for items.."
+              />
+            </span>
 
-                      <p className="text-base font-black leading-none text-green-400">
-                        {"₹" + item.cost}
-                      </p>
+            <span className={styles.addS} onClick={addThisItem}>
+              ADD
+            </span>
+
+            <div className={styles.mainList}>
+              {suggestionList.map((item, index) => (
+                <div
+                  key={`${item.title}-${index}`}
+                  className={styles.item}
+                  onClick={() => fillInput(item.title)}
+                >
+                  <div className="md:flex items-center py-8 border-t border-gray-200">
+                    <div className="md:pl-3 md:w-3/4">
+                      <div className="flex items-center justify-between w-full pt-1">
+                        <p className="text-base font-black leading-none text-gray-800">
+                          {item.title}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-5 pr-6">
+                        <p className="text-base font-black leading-none text-green-400">
+                          {"₹" + item.cost}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-        </div>
+          {orderList.map(({ name, cost }, index) => (
+            <div key={`${name}-${index}`} className={styles.tile}>
+              <span className={styles.name}>{name}</span>
+              <span className={styles.cost}>{"₹" + cost}</span>
 
-        {orderList.map(({ name, cost }, index) => (
-          <div className={styles.tile}>
-            <span className={styles.name}>{name }</span>
-            <span className={styles.cost}>{"₹" + cost}</span>
-            <span className={styles.icon}>
-              <div className={styles.popup} onClick={() => myFunction(index)}>
-                ...
-                <span className={styles.popuptext} id={"myPopup" + index} >
-                  <div>
-                    <div className={styles.addAgain} onClick={() => addAgain(index)}>
-                      <span>
-                        <AiOutlinePlusCircle className={styles.iconD} />
-                      </span>
-                      <span> Add again</span>
+              <span className={styles.icon}>
+                <div
+                  className={styles.popup}
+                  onClick={() => myFunction(index)}
+                >
+                  ...
+                  <span className={styles.popuptext} id={"myPopup" + index}>
+                    <div>
+                      <div
+                        className={styles.addAgain}
+                        onClick={() => addAgain(index)}
+                      >
+                        <span>
+                          <AiOutlinePlusCircle className={styles.iconD} />
+                        </span>
+                        <span> Add again</span>
+                      </div>
+
+                      <div
+                        className={styles.delete}
+                        onClick={() => deleteItem(index)}
+                      >
+                        <span>
+                          <AiFillDelete className={styles.iconD} />
+                        </span>
+                        <span>Delete</span>
+                      </div>
                     </div>
-                    <div className={styles.delete} onClick={() => deleteItem(index)}>
-                      <span>
-                        <AiFillDelete className={styles.iconD} />
-                      </span>
-                      <span>Delete</span>
-                    </div>
-                  </div>
-                </span>
-              </div>
+                  </span>
+                </div>
+              </span>
+            </div>
+          ))}
+
+          <p className={styles.dcost}>+10% delivery cost</p>
+
+          <div className={styles.bottom}>
+            <span className={styles.fc}>{"₹" + fc}</span>
+            <span className={styles.submit} onClick={placeOrder}>
+              Place order
             </span>
           </div>
-        ))}
-        <p className={styles.dcost}>+10% delivery cost</p>
-        <div className={styles.bottom}>
-          <span className={styles.fc}>{"₹" + fc}</span>
-          <span className={styles.submit} onClick={placeOrder}>Place order</span>
         </div>
-
-
-
       </div>
-    </div>
-
-
-
-  </>
-
-
-
-);
-
-
+    </>
+  );
 }
 
 export default PopUp;

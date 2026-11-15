@@ -220,37 +220,37 @@ export default function Layout({ children },props) {
             <ul className="mt-12">
               
               {menuItems.map(({ href, title }) => {
-                let Icon;
-                if(title == "All"){
-                  Icon = SVGicon.All;
-                }
-                else if (title == "TakenUp")
-                {
-                  Icon = SVGicon.TakenUp;
-                }
-                else if (title == "Active") {
-                  Icon = SVGicon.Active;
-                }
-                else if (title == "Ongoing") {
-                  Icon = SVGicon.Ongoing;
-                }
-                else if (title == "Your") {
-                  Icon = SVGicon.Your;
-                }
-                
-                
-                
-                return(
+  let Icon;
 
-                <li className="flex w-full justify-between text-gray-600 hover:text-white cursor-pointer items-center mb-6" id="activee">
-                  <div className="flex items-center">
-                    
+  if (title === "All") {
+    Icon = SVGicon.All;
+  } else if (title === "TakenUp") {
+    Icon = SVGicon.TakenUp;
+  } else if (title === "Active") {
+    Icon = SVGicon.Active;
+  } else if (title === "Ongoing") {
+    Icon = SVGicon.Ongoing;
+  } else if (title === "Your") {
+    Icon = SVGicon.Your;
+  }
 
-                    <Link className="text-sm  ml-2" id={href} href={href}>{<p id={href}>{title}</p>}</Link>
-                  </div>
-                    <div className="py-1 px-3  rounded text-gray-500 flex items-center justify-center text-lg" >{Icon}</div>
-                </li>
-                )
+  return (
+    <li
+      key={href}
+      className="flex w-full justify-between text-gray-600 hover:text-white cursor-pointer items-center mb-6"
+      id="activee"
+    >
+      <div className="flex items-center">
+        <Link className="text-sm ml-2" id={href} href={href}>
+          <p id={href}>{title}</p>
+        </Link>
+      </div>
+
+      <div className="py-1 px-3 rounded text-gray-500 flex items-center justify-center text-lg">
+        {Icon}
+      </div>
+    </li>
+  );
 })}
               
             </ul>

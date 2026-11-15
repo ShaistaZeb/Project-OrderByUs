@@ -1,30 +1,57 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     function signedIn() {
       return request.auth != null;
     }
 
-    // User profiles. Signed-in users can read them; only the owner can write their own.
+    // User profiles
     match /database/{uid} {
       allow read: if signedIn();
       allow write: if signedIn() && request.auth.uid == uid;
     }
 
-    // Orders live in a collection named after their owner's uid. Everyone signed in can see
-    // them (that's how agents find orders), the owner controls their own orders, and anyone
-    // else may only claim an unclaimed order for themselves, touching only the claim fields.
+    // Customer orders
     match /{ownerId}/{orderId} {
+
+      // Another user can claim an unclaimed order.
       function isClaim() {
         return resource.data.takenUp == 0
           && request.resource.data.takenUp == 1
           && request.resource.data.agent_id == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
-               .hasOnly(["agent_id", "orderList", "cost", "takenUp", "mobile"]);
+               .hasOnly([
+                 "agent_id",
+                 "orderList",
+                 "cost",
+                 "takenUp",
+                 "agent_mobile"
+               ]);
       }
+
+      // Only the assigned agent can mark the order as delivered.
+      function isDeliveryUpdate() {
+        return resource.data.takenUp == 1
+          && resource.data.agent_id == request.auth.uid
+          && resource.data.delivered == 0
+          && request.resource.data.delivered == 1
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["delivered"]);
+      }
+
       allow read: if signedIn();
-      allow create, delete: if signedIn() && request.auth.uid == ownerId;
-      allow update: if signedIn() && (request.auth.uid == ownerId || isClaim());
+
+      allow create, delete: if signedIn()
+        && request.auth.uid == ownerId;
+
+      allow update: if signedIn()
+        && (
+          request.auth.uid == ownerId
+          || isClaim()
+          || isDeliveryUpdate()
+        );
     }
   }
 }

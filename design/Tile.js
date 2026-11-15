@@ -9,7 +9,12 @@ import { db, deleteDoc, doc, setDoc, updateDoc, getDocs, collection, getDoc, run
 import { database } from "../firebase-config";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { useRouter } from "next/router";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  PhoneAuthProvider,
+  linkWithCredential
+} from "firebase/auth";
 
 import { authentication } from '../firebase-config'
 function Tile(props) {
@@ -40,7 +45,7 @@ function Tile(props) {
             tx.update(orderRef, {
             // order_id: props.orderid,
             // location: props.location,
-            agent_id: user?.uid,
+             agent_id: authentication.currentUser?.uid,
             // user_id: props.user_id,
             // finalCost: props.cost,
             orderList: props.orderlist,
@@ -50,7 +55,7 @@ function Tile(props) {
             takenUp: 1,
             // delivered: props.delivered,
             // uid: props.uid,
-            mobile: number,
+           agent_mobile: number,
             // paid:props.paid
             });
           });
@@ -107,25 +112,11 @@ function Tile(props) {
     })
   }
 
-  let t = 0;
-  const fun = () => {
-    if (t % 2 == 0) {
-      document.getElementById("toggle" + props.orderid).style.cssText =
-        " transform: rotate(-180deg) ;transition:0.5s ";
-      document.getElementById("card" + props.orderid).style.cssText =
-        " max-height:1000px; transition: max-height 1s ease-in-out;";
-    } else {
-      document.getElementById("card" + props.orderid).style.cssText =
-        "transition: max-height 0.5s ease-out;max-height:130px;";
-      document.getElementById("toggle" + props.orderid).style.cssText =
-        " transform: rotate(0deg); transition:0.5s ";
-    }
-    t++;
+  const [expanded, setExpanded] = useState(false);
 
-    
-
-    // ele.classList.add("active");
-  };
+const fun = () => {
+  setExpanded((previous) => !previous);
+};
 
   const [temp, setTemp] = useState([]);
   const [cost, setCost] = useState(0);
@@ -214,32 +205,71 @@ function Tile(props) {
     }
   }
 
-  const verifyOTP = (e) => {
-    let otp = e.target.value;
-    setOTP(otp);
-    if (otp.length === 6) {
-      
-      let confirmationResult = window.confirmationResult;
-      confirmationResult.confirm(otp).then((result) => {
-        const userr = result.user;
-        setVerified(true);
-        setExpandForm(false);
-        const updateNumber = async () => {
-          // 
-          await setDoc(doc(database, "database", user?.uid), {
-            uid: user?.uid,
-            number: number,
-          });
-        }
-        updateNumber();
-        alert("success logged in");
+  const verifyOTP = async (e) => {
+  const otp = e.target.value.trim();
+  setOTP(otp);
 
+  if (otp.length === 6) {
+    try {
+      const currentUser = authentication.currentUser;
 
-      }).catch((error) => {
-        alert("error otp");
-      });
+      if (!currentUser) {
+        alert("Please log in to your agent account first.");
+        return;
+      }
+
+      const confirmationResult = window.confirmationResult;
+
+      if (!confirmationResult) {
+        alert("Please request OTP first.");
+        return;
+      }
+
+      // Create phone authentication credential
+      const credential = PhoneAuthProvider.credential(
+        confirmationResult.verificationId,
+        otp
+      );
+
+      // Link phone number to the existing agent account
+      const result = await linkWithCredential(
+        currentUser,
+        credential
+      );
+
+      const agentUid = result.user.uid;
+
+      // Save the agent's phone number in Firestore
+      await setDoc(
+  doc(database, "database", agentUid),
+  {
+    uid: agentUid,
+    number: number
+  },
+  { merge: true }
+);
+
+      setVerified(true);
+      setExpandForm(false);
+      setDisable(true);
+
+      alert("Phone number successfully linked to agent account!");
+
+    } catch (error) {
+      console.error("Phone verification error:", error);
+
+      if (error.code === "auth/credential-already-in-use") {
+        alert("This phone number is already linked to another account.");
+      } else if (error.code === "auth/invalid-verification-code") {
+        alert("Incorrect OTP. Please try again.");
+      } else if (error.code === "auth/provider-already-linked") {
+        alert("A phone number is already linked to this account.");
+      } else {
+        alert(error.message || "Phone verification failed.");
+      }
     }
   }
+};
 
   useEffect(() => {
     
@@ -252,11 +282,15 @@ function Tile(props) {
 
     //getting agent details
     const accessToken = userAccessToken();
-    if (accessToken) {
-      const [userInfo] = fetchUser();
-    }
-    
-    setUser(userInfo);
+
+let userInfo = null;
+
+if (accessToken) {
+  const storedUser = fetchUser();
+  userInfo = Array.isArray(storedUser) ? storedUser[0] : null;
+}
+
+setUser(userInfo);
     const fetchNumber = async () => {
       
       try {
@@ -318,7 +352,14 @@ function Tile(props) {
     // }));
   }, []);
   return (
-    <div className={styles.card2} id={"card" + props.orderid} >
+    <div
+  className={styles.card2}
+  id={"card" + props.orderid}
+  style={{
+    maxHeight: expanded ? "1000px" : "130px",
+    transition: "max-height 1s ease-in-out",
+  }}
+>
       <div className={styles.content} onClick={fun}>
         <div className={styles.details}>
           <div id={styles.table}>
@@ -346,20 +387,20 @@ function Tile(props) {
         <div className={styles.bottom}>
           <div>
             <p>Item_name</p>
-            {props.orderlist.map(({ name }) => (
-              <p className={styles.p1}>{name}</p>
-            ))}
+            {props.orderlist.map(({ name }, index) => (
+  <p key={index} className={styles.p1}>{name}</p>
+))}
           </div>
           <div className={styles.p2}>
             <p>Cost</p>
-            {props.orderlist.map(({ cost }) => (
-              <p className={styles.p1}>{"₹" + cost}</p>
-            ))}
+            {props.orderlist.map(({ cost }, index) => (
+  <p key={index} className={styles.p1}>{"₹" + cost}</p>
+))}
           </div>
           <div className={styles.p3}>
             <p>Availability</p>
-            {props.orderlist.map(({ availability }, index) => (
-              <p>
+           {props.orderlist.map(({ availability }, index) => (
+  <p key={index}>
                 {availability == 0 ? (
                   <label className={styles.container}>
                     <input type="checkbox" className={styles.container}  onClick={() => checkBox(index, 0)} />
@@ -397,12 +438,30 @@ function Tile(props) {
         </div>
         <div className={styles.bb}>
           <div className={styles.finalCost}>{`₹` + cost}</div>
-          <div className={styles.takenUp} onClick={takenUpfun}>{props.takenup == 0 ? "Take up" : "bye"}</div>
+          <button
+  type="button"
+  className={styles.takeUpButton}
+  onClick={(e) => {
+    e.stopPropagation();
+    takenUpfun();
+  }}
+  disabled={props.takenup != 0}
+>
+  {props.takenup == 0 ? "Take Up Order" : "Already Taken"}
+</button>
         </div>
       </div>
-      <div className={styles.toggle} onClick={fun}>
-        <AiOutlineArrowDown id={"toggle" + props.orderid} onClick={fun} />
-      </div>
+      <div className={styles.toggle}>
+  <AiOutlineArrowDown
+    id={"toggle" + props.orderid}
+    onClick={fun}
+    style={{
+      transform: expanded ? "rotate(-180deg)" : "rotate(0deg)",
+      transition: "transform 0.5s ease",
+      cursor: "pointer",
+    }}
+  />
+</div>
       
     </div>
   );

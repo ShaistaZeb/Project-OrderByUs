@@ -1,26 +1,38 @@
-import React from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut
+} from 'firebase/auth';
+
 import { firebaseApp } from '../firebase-config';
-import { useState } from 'react';
 
 const Register=(props)=> {
   // const email = props.email;
   // const password = props.password;
-  const createUser = ()=>{
-    const auth = getAuth(firebaseApp);
-      createUserWithEmailAndPassword(auth,email,password).then(
-        (userCredential)=>{
-          const user = userCredential.user;
-          user.sendEmailVerification();
-          auth.signOut();
-          alert("email sent check ur inbox  ");
-        }
-      ).catch((error)=>{
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        alert(error);
-      })
+  const createUser = async () => {
+  const auth = getAuth(firebaseApp);
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password
+    );
+
+    const user = userCredential.user;
+
+    await sendEmailVerification(user);
+
+    await signOut(auth);
+
+    alert("Account created successfully. Please check your email for verification.");
+  } catch (error) {
+    console.error("Registration error:", error);
+    alert(error.message);
   }
+};
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

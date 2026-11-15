@@ -157,11 +157,16 @@ function TakenUpOrders() {
                             uid,
                             delivered,
                             paid,
-                            cost
-                        })=>(
+                            cost,
+                            agent_accept,
+                            terms_and_conditions,
+                            agent_mobile,
+                            agent_id
+                        }) => (
                    
-                            <TileTakenUp key={order_id}
-                            date={date}
+                           <TileTakenUp
+                                key={order_id}
+                                date={date}
                                 time={time}
                                 index={index}
                                 orderid={order_id}
@@ -173,7 +178,12 @@ function TakenUpOrders() {
                                 uid={uid}
                                 cost={cost}
                                 delivered={delivered}
-                                paid={paid}/>
+                                paid={paid}
+                                agent_accept={agent_accept}
+                                terms_and_conditions={terms_and_conditions}
+                                agent_mobile={agent_mobile}
+                                agent_id={agent_id}
+                            />
                     
                 )):<>NO data</>}
                 </div>

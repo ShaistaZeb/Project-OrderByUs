@@ -22,25 +22,11 @@ function TileOnGoing(props) {
     const [aA,setaA] = useState(0);
     const [aDA, setaDA] = useState(0);
     const [aTC,setaTC] = useState(0);
-    let t = 0;
+    const [expanded, setExpanded] = useState(false);
+    // let t = 0;
     const fun = () => {
-        if (t % 2 == 0) {
-            document.getElementById("toggle" + props.orderid).style.cssText =
-                " transform: rotate(-180deg) ;transition:0.5s ";
-            document.getElementById("card" + props.orderid).style.cssText =
-                " max-height:1000px; transition: max-height 1s ease-in-out;";
-        } else {
-            document.getElementById("card" + props.orderid).style.cssText =
-                "transition: max-height 0.5s ease-out;max-height:130px;";
-            document.getElementById("toggle" + props.orderid).style.cssText =
-                " transform: rotate(0deg); transition:0.5s ";
-        }
-        t++;
-
-        
-
-        // ele.classList.add("active");
-    };
+    setExpanded((previous) => !previous);
+};
 
 
    
@@ -96,50 +82,51 @@ function TileOnGoing(props) {
         }
     }
 
-    const buttonSubmit = async()=>{
-        
-        if(aA && aTC)
-        {
-            try {
-                await updateDoc(doc(database, props.uid, props.orderid), {
-                    
-                    delivered: 1,
-                    agent_accept:true,
-                    terms_and_conditions:true,
-                    
-                })
-                router.reload(window.location.pathname);
+const buttonSubmit = async () => {
+    if (aA && aTC) {
+        try {
+            await updateDoc(doc(database, props.uid, props.orderid), {
+                agent_accept: true,
+                terms_and_conditions: true,
+            });
 
-            } catch (error) {
-                alert(error);
-            }
-        }
-        else if(aDA && aTC){
-            alert("rejected");
-            try {
-                await updateDoc(doc(database, props.uid, props.orderid), {
+            alert("Agent accepted successfully!");
+            router.reload(window.location.pathname);
 
-                    delivered: -1,
-                    agent_accept: false,
-                    terms_and_conditions: true,
-
-                })
-                router.reload(window.location.pathname);
-
-            } catch (error) {
-                alert(error);
-            }
-
-        }
-        else
-        {
-            alert("click two checkboxes");
+        } catch (error) {
+            alert(error.message || error);
         }
     }
+    else if (aDA && aTC) {
+        try {
+            await updateDoc(doc(database, props.uid, props.orderid), {
+                agent_accept: false,
+                terms_and_conditions: true,
+            });
+
+            alert("Agent rejected.");
+            router.reload(window.location.pathname);
+
+        } catch (error) {
+            alert(error.message || error);
+        }
+    }
+    else {
+        alert("Please select your decision and accept the terms and conditions.");
+    }
+};
+
     return (
 
         <>
-            <div className={styles.card2} id={"card" + props.orderid} >
+            <div
+    className={styles.card2}
+    id={"card" + props.orderid}
+    style={{
+        maxHeight: expanded ? "1000px" : "130px",
+        transition: "max-height 0.5s ease-in-out"
+    }}
+>
                 <div className={styles.content} onClick={fun}>
                     <div className={styles.details}>
                         <div id={styles.table}>
@@ -166,43 +153,64 @@ function TileOnGoing(props) {
                 <div className={styles.line}></div>
                 <div className={styles.dropdown}>
                     <div className={styles.bottom}>
-                        <div >
-                            <p>Item_name</p>
-                            {props.orderList.map(({ name }) => (
-                                <p className={styles.p1}>{name}</p>
-                            ))}
-                        </div>
+                        <div className={styles.p1}>
+    {props.orderList.map(({ name, id }) => (
+        <p key={id}>{name}</p>
+    ))}
+</div>
+
                         <div className={styles.p2}>
-                            <p>Cost</p>
-                            {props.orderList.map(({ cost }) => (
-                                <p className={styles.p1}>{"₹" + cost}</p>
-                            ))}
-                        </div>
-                        <div className={styles.p3}>
-                            <p>Availability</p>
-                            {props.orderList.map(({ availability }, index) => (
-                                <p>
-                                    {availability == 0 ? (
-                                        <label className={styles.container}>
-                                            <input type="checkbox" className={styles.container} disabled />
-                                        </label>
-                                    ) : (
-                                        <label className={styles.container}>
-                                                <input type="checkbox" className={styles.container} checked="checked" disabled color="black" />
-                                        </label>
-                                    )}
-                                </p>
-                            ))}
-                        </div>
+    <p>Cost</p>
+    {props.orderList.map(({ cost, id }) => (
+        <p key={id} className={styles.p1}>
+            {"₹" + cost}
+        </p>
+    ))}
+</div>
+                       <div className={styles.p3}>
+    <p>Availability</p>
+    {props.orderList.map(({ availability, id }) => (
+        <p key={id}>
+            <label className={styles.container}>
+                <input
+                    type="checkbox"
+                    className={styles.container}
+                    checked={availability !== 0}
+                    disabled
+                    readOnly
+                />
+            </label>
+        </p>
+    ))}
+</div>
                     </div>
                     <div className={styles.bb}>
                         <div className={styles.finalCost}>{`₹` + props.cost}</div>
-                        {props.paid == true ? <></> : <div className={styles.takenUp} onClick={() => paid(props.orderid, props.uid)}>{props.takenup == 0 ? "Take up" : "View Mobile Number"}</div>}
+                        {props.paid == true ? null : (
+  <button
+    type="button"
+    className={styles.viewDetailsButton}
+    onClick={(e) => {
+      e.stopPropagation();
+      paid(props.orderid, props.uid);
+    }}
+  >
+    {props.takenup == 0 ? "Take up" : "View Mobile Number"}
+  </button>
+)}
 
                     </div>
                 </div>
                 <div className={styles.toggle}>
-                    <AiOutlineArrowDown id={"toggle" + props.orderid} onClick={fun} />
+                    <AiOutlineArrowDown
+    id={"toggle" + props.orderid}
+    onClick={fun}
+    style={{
+        transform: expanded ? "rotate(-180deg)" : "rotate(0deg)",
+        transition: "transform 0.5s ease",
+        cursor: "pointer"
+    }}
+/>
                 </div>
                 {props.paid == true ?
                 <div>
@@ -226,10 +234,15 @@ function TileOnGoing(props) {
                             <span><input type="checkbox" id={"ATC" + props.orderid} onClick={() => atc("ATC" + props.orderid,aTC)}/></span>
                             <span>Accept terms & conditions</span>
                         </div>
-                        <div onClick={buttonSubmit}>
-                            <span ><button onClick={buttonSubmit} className={styles.button}>Submit</button></span>
-                            
-                        </div>
+                        <div>
+    <button
+        type="button"
+        onClick={buttonSubmit}
+        className={styles.button}
+    >
+        Submit
+    </button>
+</div>
                 </div>:<div>Click on view to get details of agent</div>}
             </div> 
             

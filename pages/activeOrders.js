@@ -44,117 +44,110 @@ function ActiveOrders() {
 
   const [user, setUser] = useState(null);
   const [time, settime] = useState(0);
-  var ll = false;
+  // var ll = false;
   const [showModal, setShowModal] = useState(false);
   
   
-  useEffect( () => { 
-    const p = router.asPath[router.asPath.length - 1];
-    if (p == "t") {
-      setShowModal(true);
-    }
+useEffect(() => {
+  let ll = false;
+  let inst;
+  let timeoutId;
+  let isMounted = true;
+  const p = router.asPath[router.asPath.length - 1];
 
-    console.log(p);
-    
-    document.getElementById("network").style.visibility = "hidden";
-    
-    function showDiv1() {
-      if(ll == true)
-      {
-        document.getElementById("network").style.visibility = "visible";
+  if (p === "t") {
+    setShowModal(true);
+  }
 
-        function change() {
-          if (ll == false) {
-            document.getElementById("network").style.visibility = "hidden";
-            
-            clearInterval(inst);
-          }
+  console.log(p);
+
+  const networkElement = document.getElementById("network");
+
+  if (networkElement) {
+    networkElement.style.visibility = "hidden";
+  }
+
+  function showDiv1() {
+    if (ll === true && networkElement) {
+      networkElement.style.visibility = "visible";
+
+      inst = setInterval(() => {
+        if (ll === false) {
+          networkElement.style.visibility = "hidden";
+          clearInterval(inst);
         }
-        var inst = setInterval(change, 1000);
-      }
-      
-      
-
+      }, 1000);
     }
-    setTimeout(showDiv1, 15000);
-    setLoader(true);
-    ll = true
-    const fetchData = async()=>{
-      const accessToken = userAccessToken();
-      if (!accessToken) 
-      {
-        alert("login to enter orderspage")
-        return router.push("/home");
-      }
-      
-      const [userInfo] = fetchUser();
-      
-      
-      setUser(userInfo);
+  }
 
-      try {
-        var l = [];
-        const querySnapshot = await getDocs(collection(database, "database"));
-        
-        if (querySnapshot.size)
-          querySnapshot.forEach(async (doc) => {
-            l.push(doc.id);
-            
-            
+  timeoutId = setTimeout(showDiv1, 15000);
 
-          });
-        
-        //   
-        l.map(async (uid) => {
-          const qSS = await getDocs(collection(database, uid));
-          if (qSS.size) {
-            qSS.forEach(async (d) => {
+  setLoader(true);
+  ll = true;
 
-              const docRef = doc(database, uid, d.id);
-              const docSnap = await getDoc(docRef);
-              if (docSnap.exists()) {
-                if (docSnap.data().takenUp == 0)
-                  list.push(docSnap.data());
-                const l = list;
-                setlist([]);
-                setlist(l);
-                // console.log(list, "ordersss");
-                list.sort((a, b) => {
-                  return b.time.localeCompare(a.time);
-                });
-                // console.log(list, "orders");
-                // list["time"].sort();
-              } else {
-                // doc.data() will be undefined in this case
-                
-              }
+  const fetchData = async () => {
+    const accessToken = userAccessToken();
 
-            });
-          }
-          setLoader(false);
-          ll =false;
-
-        });
-        
-
-
-      } catch (error) {
-        alert(error);
-        
-      }
-
-
-
-
-
-    // var s = await setDoc(doc(database, "database", user?.uid), {
-    //     uid: user?.uid,
-    // });
-    //   //getting database values
+    if (!accessToken) {
+      alert("Login to enter orders page");
+      router.push("/home");
+      return;
     }
-    fetchData();
-    // setLoader(false);
-  }, []);
+
+    const storedUser = fetchUser();
+    const userInfo = Array.isArray(storedUser) ? storedUser[0] : null;
+    setUser(userInfo);
+
+    try {
+      const querySnapshot = await getDocs(
+        collection(database, "database")
+      );
+
+      const orderResults = await Promise.all(
+        querySnapshot.docs.map(async (userDoc) => {
+          const ordersSnapshot = await getDocs(
+            collection(database, userDoc.id)
+          );
+
+          return ordersSnapshot.docs
+            .map((orderDoc) => orderDoc.data())
+            .filter((order) => order.takenUp == 0);
+        })
+      );
+
+      const allOrders = orderResults.flat();
+
+      allOrders.sort((a, b) =>
+        (b.time || "").localeCompare(a.time || "")
+      );
+
+      if (isMounted) {
+  setlist(allOrders);
+}
+    } catch (error) {
+      console.error("Active Orders Firestore error:", error);
+      alert("Unable to fetch orders. Please check the console for details.");
+    } finally {
+  if (isMounted) {
+    setLoader(false);
+  }
+  ll = false;
+}
+  };
+
+  fetchData();
+
+  return () => {
+  isMounted = false;
+  ll = false;
+  clearTimeout(timeoutId);
+
+  if (inst) {
+    clearInterval(inst);
+  }
+};
+}, []);
+
   
   const openSheet = () => {
     document.getElementById("popup").style.cssText = `visibility:visible;`;

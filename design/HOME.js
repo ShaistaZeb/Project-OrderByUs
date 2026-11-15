@@ -20,8 +20,15 @@ function HOME() {
     const firebaseAuth = getAuth(firebaseApp);
     const { user } = await signInWithPopup(firebaseAuth, provider);
     const { refreshToken, providerData } = user;
-    
-    localStorage.setItem("user", JSON.stringify(providerData));
+    const storedUser = [{
+    ...(providerData?.[0] || {}),
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+    phoneNumber: user.phoneNumber,
+}];
+    localStorage.setItem("user", JSON.stringify(storedUser));
     localStorage.setItem("accessToken", JSON.stringify(refreshToken));
     router.push("/activeOrders");
   };
@@ -33,8 +40,15 @@ function HOME() {
         // Signed in 
         const user = userCredential.user;
         const {refreshToken, providerData} = user;
-        
-        localStorage.setItem("user", JSON.stringify(providerData));
+        const storedUser = [{
+    ...(providerData?.[0] || {}),
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+    phoneNumber: user.phoneNumber,
+}];
+        localStorage.setItem("user", JSON.stringify(storedUser));
         localStorage.setItem("accessToken", JSON.stringify(refreshToken));
         router.push("/activeOrders");
         // ...

@@ -304,3 +304,65 @@
 .button:hover{
   background-color: rgb(205, 205, 205);
 }
+
+.takeUpButton {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #16834a;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.2s ease,
+              transform 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+.takeUpButton:hover:not(:disabled) {
+  background: #116b3b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.22);
+}
+
+.takeUpButton:active:not(:disabled) {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.takeUpButton:disabled {
+  background: #999;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.viewDetailsButton {
+    padding: 11px 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    border: none;
+    border-radius: 8px;
+    background: #167d48;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.viewDetailsButton:hover {
+    background: #116638;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.viewDetailsButton:active {
+    transform: translateY(2px) scale(0.97);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}

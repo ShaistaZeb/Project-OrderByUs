@@ -14,13 +14,19 @@ function Read() {
     let [array, setArray] = useState([]);
 
     useEffect(() => {
-        const accessToken = userAccessToken();
-        if (accessToken) {
-            const [userInfo] = fetchUser();
-        }
-        console.log(userInfo);
-        setUser(userInfo);
-    }, []);
+    const accessToken = userAccessToken();
+
+    if (!accessToken) {
+        console.log("No access token found.");
+        return;
+    }
+
+    const storedUser = fetchUser();
+    const userInfo = Array.isArray(storedUser) ? storedUser[0] : null;
+
+    console.log(userInfo);
+    setUser(userInfo || null);
+}, []);
 
     const readData=async ()=>{
         setArray(array => [[], []]);

@@ -84,79 +84,63 @@ const Login = () => {
         }
     }
 
-    const sendDataToFirestore = async (providerData) => {
-        const uid = providerData[0]?.uid;
-        // providerData[0]
-        try {
-            await setDoc(doc(database, "database", uid), {
-                uid: uid,
-                number: 0,
-            });
+const sendDataToFirestore = async (user) => {
+    const uid = user.uid;
 
-
-        } catch (error) {
-
-            setLoading(false);
-            alert(error);
-        }
+    if (!uid) {
+        throw new Error("User UID is missing.");
     }
 
-    const createAccount = () => {
-        document.getElementById("load").style.backgroundColor = "rgba(232 ,156, 7,0.6)";
-        setLoading(true)
-        if (password === confirmPassword) {
+    await setDoc(doc(database, "database", uid), {
+        uid: uid,
+        number: 0,
+    });
 
+    console.log("Firestore account document created:", uid);
+};
+const createAccount = async () => {
+    if (password !== confirmPassword) {
+        alert("Password error");
+        return;
+    }
 
+    setLoading(true);
 
-            createUserWithEmailAndPassword(auth, email, password).then(
-                (userCredential) => {
-                    const user = userCredential.user;
-                    const { refreshToken, providerData } = user;
-                    // const uid = user[0].uid;
-                    // const uid = providerData.uid;
-                    try {
-                        sendEmailVerification(user)
-                        alert("email sent check your spam folder in mail  ");
-                    } catch (error) {
-                        alert(error);
-                    }
+    try {
+        const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
 
+        const user = userCredential.user;
 
+        // Create the Firestore account document first.
+        await sendDataToFirestore(user);
 
-
-                    setPage("signin");
-                    sendDataToFirestore(providerData);
-                    alert("account created");
-                    document.getElementById("load").style.backgroundColor = "rgba(232 ,156, 7,0.9)";
-                    setLoading(false);
-                    // document.getElementById("load").style.backgroundColor = "black"
-                    // const { refreshToken, providerData } = user;
-                    //
-                    // localStorage.setItem("user", JSON.stringify(providerData));
-                    // localStorage.setItem("accessToken", JSON.stringify(refreshToken));
-                    // router.push("/activeOrders");
-
-                }
-            ).catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-
-                document.getElementById("load").style.backgroundColor = "rgba(232 ,156, 7,0.9)";
-                setLoading(false);
-                // document.getElementById("load").style.backgroundColor = "black"
-                alert(error);
-
-
-            });
+        // Send email verification.
+        try {
+            await sendEmailVerification(user);
+            alert("Verification email sent. Check your inbox or spam folder.");
+        } catch (verificationError) {
+            console.error("Email verification error:", verificationError);
+            alert("Account created, but the verification email could not be sent.");
         }
-        else {
-            alert("password error");
-        }
+
+        setPage("signin");
+        alert("Account created successfully.");
+
+    } catch (error) {
+        console.error("Account creation error:", error);
+        alert(error.message || "Account creation failed.");
+    } finally {
+        setLoading(false);
         setEmail("");
         setConfirmPassword("");
         setPassword("");
-
     }
+};
+
 
     const forgotPassword = () => {
         router.push('/forgotpassword');
@@ -172,8 +156,15 @@ const Login = () => {
                 const user = userCredential.user;
                 if (user.emailVerified) {
                     const { refreshToken, providerData } = user;
-
-                    localStorage.setItem("user", JSON.stringify(providerData));
+                    const storedUser = [{
+    ...(providerData?.[0] || {}),
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+    phoneNumber: user.phoneNumber,
+}];
+                    localStorage.setItem("user", JSON.stringify(storedUser));
                     localStorage.setItem("accessToken", JSON.stringify(refreshToken));
                     router.push("/activeOrders");
                 }
