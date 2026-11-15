@@ -3,10 +3,22 @@
 // import { useRouter } from "next/router";
 
 
+
 function imagee(s) {
-    let change_image=document.getElementById("food-image");
-    change_image.src=`./images/${s}.jpg`;
+    const change_image = document.getElementById("food-image");
+
+    const foodImages = {
+        "Manchuria": "manchuria.JPG",
+        "Biryani": "biryani.jpg",
+        "Noodles": "noodles.jpg",
+        "Egg Rice": "egg rice.jpg"
+    };
+
+    if (foodImages[s]) {
+        change_image.src = `./images/${foodImages[s]}`;
+    }
 }
+
 
 function returnImage(s) {
     let change_image=document.getElementById("food-image");
